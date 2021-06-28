@@ -246,4 +246,19 @@ module.exports = {
       endTime: moment(res.endTime).format('DD-MM-YYYY HH:mm'),
     };
   },
+  cancelAppointment: async (args) => {
+    try {
+      const appointment = await Appointment.findById(
+        args.appointmentId
+      ).populate('service');
+      const service = {
+        ...appointment.service._doc,
+        _id: appointment.service.id,
+      };
+      await Appointment.deleteOne({ _id: args.appointmentId });
+      return service;
+    } catch (err) {
+      throw err;
+    }
+  },
 };
