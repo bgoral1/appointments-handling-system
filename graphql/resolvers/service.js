@@ -14,7 +14,10 @@ module.exports = {
         throw err;
       });
   },
-  createService: (args) => {
+  createService: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error('Unauthenticated');
+    }
     const service = new Service({
       name: args.serviceInput.name,
       duration: args.serviceInput.duration,

@@ -10,15 +10,17 @@ module.exports = {
         });
       })
       .catch((err) => {
-        console.log(err);
         throw err;
       });
   },
-  createDentist: (args) => {
+  createDentist: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error('Unauthenticated');
+    }
     const dentist = new Dentist({
       daysOff: args.dentistInput.daysOff,
       workingTime: args.dentistInput.workingTime,
-      user: '60d9e1ab1691d56bdc5ef33d',
+      user: req.userId,
     });
 
     // !!! Add prevention from saving another dentist with the same user

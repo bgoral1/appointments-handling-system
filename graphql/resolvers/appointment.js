@@ -27,7 +27,10 @@ const transformAppointment = (appointment) => {
 };
 
 module.exports = {
-  appointments: () => {
+  appointments: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error('Unauthenticated');
+    }
     return Appointment.find()
       .then((appointments) => {
         return appointments.map((appointment) => {
@@ -66,7 +69,10 @@ module.exports = {
     const res = await appointment.save();
     return transformAppointment(res);
   },
-  cancelAppointment: async (args) => {
+  cancelAppointment: async (args, req) => {
+    if (!req.isAuth) {
+      throw new Error('Unauthenticated');
+    }
     try {
       const appointment = await Appointment.findById(
         args.appointmentId

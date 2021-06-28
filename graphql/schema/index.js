@@ -32,6 +32,12 @@ module.exports = buildSchema(`
       password: String
     }
 
+    type AuthData {
+      userId: ID!
+      token: String!
+      tokenExp: Int!
+    }
+
     type Dentist {
       _id: ID!
       daysOff: String!
@@ -73,6 +79,7 @@ module.exports = buildSchema(`
       services: [Service!]!
       dentists: [Dentist!]!
       appointments: [Appointment!]!
+      login(login: String!, password: String!): AuthData!
     }
 
     type RootMutation {
