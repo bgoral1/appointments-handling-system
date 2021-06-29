@@ -9,7 +9,7 @@ const Hero = () => {
           <img
             src={hero}
             class="d-block mx-lg-auto img-fluid"
-            alt="Bootstrap Themes"
+            alt="Logo Przychodni Ząbek"
             width="700"
             height="500"
             loading="lazy"
