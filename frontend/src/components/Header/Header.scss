@@ -1,0 +1,15 @@
+.button-appointment {
+  background-image: url('../../assets/icons/calendar.png');
+  background-position: 5% 50%;
+  background-size: 15% 80%;
+  background-repeat: no-repeat;
+  padding-left: 14%;
+  color: white;
+}
+
+
+ @media (max-width: 768px) {
+    .center-mobile{
+      text-align: center !important;
+  } 
+}
