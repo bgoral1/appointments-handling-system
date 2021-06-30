@@ -1,46 +1,102 @@
-import React from 'react';
+import React, { useRef, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import logo from '../assets/images/logo_zabek.png';
 
 import './Login.scss';
 
+import AuthContext from '../context/auth-context';
+
 const LoginPage = () => {
+  const { token, userId, login, logout } = useContext(AuthContext);
+  const loginInput = useRef(null);
+  const passwordInput = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const loginValue = loginInput.current.value;
+    const passwordValue = passwordInput.current.value;
+
+    if (loginValue.trim().length === 0 || passwordValue.trim().length === 0) {
+      return;
+    }
+
+    let requestBody = {
+      query: `
+        query {
+          login(login: "${loginValue}", password: "${passwordValue}") {
+            userId
+            token
+            tokenExp
+          }
+        }
+      `,
+    };
+
+    fetch('http://localhost:8000/graphql', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error('Failed!');
+        }
+        return res.json();
+      })
+      .then((resData) => {
+        if (resData.data.login.token) {
+          login(
+            resData.data.login.token,
+            resData.data.login.userId,
+            resData.data.login.tokenExpiration
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
-    <div class="login-page-wrapper">
-      <main class="form-signin">
-        <form>
-          <NavLink to="/" class="mx-auto d-block">
+    <div className="login-page-wrapper">
+      <main className="form-signin">
+        <form onSubmit={handleSubmit}>
+          <NavLink to="/" className="mx-auto d-block">
             <img
               src={logo}
               alt="logo"
               width="170px"
               height="72px"
-              class="mb-4 mx-auto d-block"
+              className="mb-4 mx-auto d-block"
             />
           </NavLink>
-          <h1 class="h3 mb-3 fw-normal">Logowanie</h1>
-          <div class="form-floating">
+          <h1 className="h3 mb-3 fw-normal">Logowanie</h1>
+          <div className="form-floating">
             <input
-              type="email"
-              class="form-control"
+              type="login"
+              className="form-control"
               id="floatingInput"
-              placeholder="name@example.com"
+              placeholder="login"
+              ref={loginInput}
             />
-            <label for="floatingInput">Email</label>
+            <label htmlFor="floatingInput">Login</label>
           </div>
-          <div class="form-floating">
+          <div className="form-floating">
             <input
               type="password"
-              class="form-control"
+              className="form-control"
               id="floatingPassword"
               placeholder="Password"
+              ref={passwordInput}
             />
-            <label for="floatingPassword">Hasło</label>
+            <label htmlFor="floatingPassword">Hasło</label>
           </div>
-          <button class="w-100 btn btn-lg btn-primary" type="submit">
+          <button className="w-100 btn btn-lg btn-primary" type="submit">
             Zaloguj się
           </button>
-          <p class="mt-5 mb-3 text-muted">&copy; 2021 Przychodnia Ząbek</p>
+          <p className="mt-5 mb-3 text-muted">&copy; 2021 Przychodnia Ząbek</p>
         </form>
       </main>
     </div>

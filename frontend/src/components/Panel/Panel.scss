@@ -1,0 +1,21 @@
+.mainPanel {
+  min-height: 80vh;
+  .btn-round {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 2rem;
+    text-align: center;
+    line-height: 2rem;
+    background-color: #12f89c;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+@media (min-width: 768px) {
+  .mainPanel main {
+    width: calc(100% - 280px);
+  }
+}
