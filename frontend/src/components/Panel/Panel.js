@@ -20,31 +20,32 @@ const Panel = () => {
       query: `
           query{
             services{
+              _id
               name
               duration
               price
             }
           }
-        `
+        `,
     };
 
     fetch('http://localhost:8000/graphql', {
       method: 'POST',
       body: JSON.stringify(requestBody),
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     })
-      .then(res => {
+      .then((res) => {
         if (res.status !== 200 && res.status !== 201) {
           throw new Error('Failed!');
         }
         return res.json();
       })
-      .then(resData => {
+      .then((resData) => {
         setServices(resData.data.services);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   }, [services]);
@@ -59,14 +60,11 @@ const Panel = () => {
     const price = +priceElRef.current.value;
     const duration = +durationElRef.current.value;
 
-    if (
-      name.trim().length === 0 ||
-      price <= 0 ||
-      price <= 0 
-    ) {return}
-      
+    if (name.trim().length === 0 || price <= 0 || price <= 0) {
+      return;
+    }
 
-    const service = {name, price, duration};
+    const service = { name, price, duration };
 
     const requestBody = {
       query: `
@@ -86,7 +84,7 @@ const Panel = () => {
       body: JSON.stringify(requestBody),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
+        Authorization: 'Bearer ' + token,
       },
     })
       .then((res) => {
@@ -101,11 +99,43 @@ const Panel = () => {
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
-   const fetchServices = () => {
-    
-   }
+  const handleDelete = (id) => {
+    const requestBody = {
+      query: `
+            mutation{
+              deleteService(serviceId: "${id}"){
+                _id
+                name
+                duration
+                price
+              }
+            }
+          `,
+    };
+
+    fetch('http://localhost:8000/graphql', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+    })
+      .then((res) => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error('Failed!');
+        }
+        return res.json();
+      })
+      .then((resData) => {
+        console.log(resData);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <div className="container">
@@ -129,44 +159,86 @@ const Panel = () => {
             >
               +
             </button>
-            <ModalComp ref={exampleModal} title="Dodaj usługę" onSubmit={modalHandler}>
-               <form>
+            <ModalComp
+              ref={exampleModal}
+              title="Dodaj usługę"
+              onSubmit={modalHandler}
+            >
+              <form>
                 <div className="mb-3">
-                  <label htmlFor="name" className="form-label">Nazwa</label>
-                  <input type="name" id="name" ref={nameElRef} className="form-control" placeholder="np. Wizyta kontrolna"/>
-                  </div>
-                <div className="mb-3">
-                  <label htmlFor="price" className="form-label">Cena (zł)</label>
-                  <input type="number" id="price" ref={priceElRef} className="form-control" placeholder="np. 100"/>
+                  <label htmlFor="name" className="form-label">
+                    Nazwa
+                  </label>
+                  <input
+                    type="name"
+                    id="name"
+                    ref={nameElRef}
+                    className="form-control"
+                    placeholder="np. Wizyta kontrolna"
+                  />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="duration" className="form-label">Czas trwania (min)</label>
-                  <input type="number" id="duration" ref={durationElRef} className="form-control" placeholder="np. 20"/>
+                  <label htmlFor="price" className="form-label">
+                    Cena (zł)
+                  </label>
+                  <input
+                    type="number"
+                    id="price"
+                    ref={priceElRef}
+                    className="form-control"
+                    placeholder="np. 100"
+                  />
                 </div>
-            </form>
+                <div className="mb-3">
+                  <label htmlFor="duration" className="form-label">
+                    Czas trwania (min)
+                  </label>
+                  <input
+                    type="number"
+                    id="duration"
+                    ref={durationElRef}
+                    className="form-control"
+                    placeholder="np. 20"
+                  />
+                </div>
+              </form>
             </ModalComp>
           </header>
-          {services !== undefined && services !== [] && ( <div className="table-responsive">
-            <table className="table table-striped table-sm">
-              <thead>
-                <tr>
-                  <th scope="col">Nazwa</th>
-                  <th scope="col">Cena</th>
-                  <th scope="col">Czas trwania</th>
-                </tr>
-              </thead>
-              <tbody>
-              {services.map(service => (
-                <tr key={service._id}>
-                  <td>{service.name}</td>
-                  <td>{service.price + " zł"}</td>
-                  <td>{service.duration + " min"}</td>
-                </tr>
-              ))}
-              </tbody>
-            </table>
-          </div>)}
-         
+          {services !== undefined && services !== [] && (
+            <div className="table-responsive">
+              <table className="table table-striped table-sm">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nazwa</th>
+                    <th scope="col">Cena</th>
+                    <th scope="col">Czas trwania</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {services.map((service, index) => (
+                    <tr key={service._id}>
+                      <td>{index + 1}</td>
+                      <td>{service.name}</td>
+                      <td>{service.price + ' zł'}</td>
+                      <td>{service.duration + ' min'}</td>
+                      <td>
+                        <button
+                          className="btn btn-outline-danger"
+                          type="submit"
+                          value="Submit"
+                          onClick={() => handleDelete(service._id)}
+                        >
+                          x
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </main>
       </div>
     </div>

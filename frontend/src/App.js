@@ -37,7 +37,8 @@ const App = () => {
               {user.token && <Redirect from="/login" to="/panel" />}
               {!user.token && <Redirect from="/panel" to="/login" />}
               <Route path="/" exact component={HomePage} />
-              <Route path="/appointment" component={AppointmentPage} />
+              {/* <Route path="/appointment" component={AppointmentPage} /> */}
+              {!user.token && <Redirect from="/appointment" to="/" />}
               {!user.token && <Route path="/login" component={LoginPage} />}
               {user.token && <Route path="/panel" component={PanelPage} />}
             </Switch>

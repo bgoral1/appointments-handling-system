@@ -32,4 +32,16 @@ module.exports = {
         throw err;
       });
   },
+  deleteService: async (args, req) => {
+    if (!req.isAuth) {
+      throw new Error('Unauthenticated');
+    }
+    try {
+      const service = await Service.findById(args.serviceId);
+      await Service.deleteOne({ _id: args.serviceId });
+      return service;
+    } catch (err) {
+      throw err;
+    }
+  },
 };

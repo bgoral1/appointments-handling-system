@@ -84,6 +84,7 @@ module.exports = buildSchema(`
 
     type RootMutation {
       createService(serviceInput: ServiceInput): Service
+      deleteService(serviceId: ID!): Service
       createPatient(patientInput: PatientInput): Patient
       createUser(userInput: UserInput): User
       createDentist(dentistInput: DentistInput): Dentist
