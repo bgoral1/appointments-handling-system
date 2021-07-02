@@ -20,8 +20,8 @@ const Sidebar = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/panel/pracownicy" className="nav-link link-dark">
-            Pracownicy
+          <NavLink to="/panel/dentysci" className="nav-link link-dark">
+            Dentyści
           </NavLink>
         </li>
       </ul>

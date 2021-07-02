@@ -55,7 +55,7 @@ module.exports = {
 
     moment.locale();
 
-    const start = moment().format();
+    const start = moment(args.appointmentInput.startTime).format();
     const end = addMinutesToDate(start, fetchedService.duration);
 
     const appointment = new Appointment({
@@ -74,12 +74,9 @@ module.exports = {
       throw new Error('Unauthenticated');
     }
     try {
-      const appointment = await Appointment.findById(
-        args.appointmentId
-      ).populate('service');
-      const service = transformService(appointment.service);
+      const appointment = await Appointment.findById(args.appointmentId);
       await Appointment.deleteOne({ _id: args.appointmentId });
-      return service;
+      return appointment;
     } catch (err) {
       throw err;
     }

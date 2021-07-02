@@ -38,9 +38,17 @@ const App = () => {
               {!user.token && <Redirect from="/panel" to="/login" />}
               <Route path="/" exact component={HomePage} />
               {/* <Route path="/appointment" component={AppointmentPage} /> */}
-              {!user.token && <Redirect from="/appointment" to="/" />}
+              {<Redirect from="/appointment" to="/" />}
               {!user.token && <Route path="/login" component={LoginPage} />}
-              {user.token && <Route path="/panel" component={PanelPage} />}
+              {user.token && (
+                <Route path="/panel" exact component={PanelPage} />
+              )}
+              {user.token && (
+                <Route path="/panel/uslugi" component={PanelPage} />
+              )}
+              {user.token && (
+                <Route path="/panel/dentysci" component={PanelPage} />
+              )}
             </Switch>
           </main>
         </AuthContext.Provider>

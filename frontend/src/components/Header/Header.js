@@ -59,13 +59,15 @@ const Header = () => {
               Zaloguj się
             </NavLink>
           )}
-          <NavLink
-            to="/appointment"
-            type="button"
-            className="btn btn-primary button-appointment"
-          >
-            Zarejstruj wizytę
-          </NavLink>
+          {!token && (
+            <NavLink
+              to="/appointment"
+              type="button"
+              className="btn btn-primary button-appointment"
+            >
+              Zarejstruj wizytę
+            </NavLink>
+          )}
         </div>
       </header>
     </div>

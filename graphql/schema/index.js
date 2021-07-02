@@ -70,6 +70,7 @@ module.exports = buildSchema(`
     }
 
     input AppointmentInput {
+      startTime: String!
       patientId: ID!
       serviceId: ID!
       dentistId: ID!
@@ -79,6 +80,7 @@ module.exports = buildSchema(`
       services: [Service!]!
       dentists: [Dentist!]!
       appointments: [Appointment!]!
+      patients: [Patient!]!
       login(login: String!, password: String!): AuthData!
     }
 
@@ -89,7 +91,7 @@ module.exports = buildSchema(`
       createUser(userInput: UserInput): User
       createDentist(dentistInput: DentistInput): Dentist
       createAppointment(appointmentInput: AppointmentInput): Appointment!
-      cancelAppointment(appointmentId: ID!): Service!
+      cancelAppointment(appointmentId: ID!): Appointment
     }
 
     schema {
