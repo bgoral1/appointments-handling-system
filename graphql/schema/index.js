@@ -78,9 +78,9 @@ module.exports = buildSchema(`
 
     type RootQuery {
       services: [Service!]!
+      patients: [Patient!]!
       dentists: [Dentist!]!
       appointments: [Appointment!]!
-      patients: [Patient!]!
       login(login: String!, password: String!): AuthData!
     }
 

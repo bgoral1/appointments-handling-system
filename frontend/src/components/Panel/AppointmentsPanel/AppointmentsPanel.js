@@ -147,13 +147,24 @@ const AppointmentsPanel = () => {
         return res.json();
       })
       .then((resData) => {
-        setAppointments(resData.data.appointments);
+        const sortedAppointments = resData.data.appointments.sort(compare);
+        setAppointments(sortedAppointments);
         setLoading(false);
       })
       .catch((err) => {
         console.log(err);
       });
   }, []);
+
+  const compare = (a, b) => {
+    if (a.startTime < b.startTime) {
+      return -1;
+    }
+    if (a.startTime > b.startTime) {
+      return 1;
+    }
+    return 0;
+  };
 
   useEffect(() => {
     setModal(new Modal(exampleModal.current));
@@ -247,7 +258,9 @@ const AppointmentsPanel = () => {
         })
         .then((resData) => {
           console.log(resData);
-          setAppointments((prev) => [...prev, resData.data.createAppointment]);
+          setAppointments((prev) =>
+            [...prev, resData.data.createAppointment].sort(compare)
+          );
         })
         .catch((err) => {
           console.log(err);
@@ -282,9 +295,11 @@ const AppointmentsPanel = () => {
       })
       .then((resData) => {
         setAppointments((prev) =>
-          prev.filter((appointment) => {
-            return appointment._id !== resData.data.cancelAppointment._id;
-          })
+          prev
+            .filter((appointment) => {
+              return appointment._id !== resData.data.cancelAppointment._id;
+            })
+            .sort(compare)
         );
       })
       .catch((err) => {
