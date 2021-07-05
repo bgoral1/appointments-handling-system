@@ -1,12 +1,11 @@
-// $primary: #45a591ff;
+$primary: #1977cc;
 
-// $theme-colors: (
-//   "primary": $primary,
-// ) !default;
-
-//primary #0d6efd
+$theme-colors: (
+  "primary": $primary,
+) !default;
 
 @import 'bootstrap/scss/bootstrap.scss';
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
 
 body {
@@ -16,3 +15,4 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+

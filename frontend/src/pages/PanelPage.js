@@ -5,7 +5,7 @@ import Panel from '../components/Panel/Panel';
 const PanelPage = () => {
   return (
     <>
-      <Header />
+      <Header/>
       <Panel />
     </>
   );

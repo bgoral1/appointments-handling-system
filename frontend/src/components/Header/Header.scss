@@ -1,3 +1,15 @@
+header{
+  background-color: #fff;
+  padding: 15px 0;
+  top: 40px !important;
+  transition: all 0.5s;
+  z-index: 0 !important;  
+  box-shadow: 0px 2px 15px rgb(249, 249, 249);
+}
+.header-scrolled {
+  top: 0 !important;
+}
+
 .button-appointment {
   background-image: url('../../assets/icons/calendar.png');
   background-position: 5% 50%;
@@ -8,7 +20,28 @@
 }
 
 @media (max-width: 768px) {
-  .center-mobile {
-    text-align: center !important;
-  }
+    .center-mobile {
+      text-align: center !important;
+    }
+}
+
+.navbar a, .navbar a:focus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 16px;
+  color: #2c4964;
+  white-space: nowrap;
+  transition: 0.3s;
+  border-bottom: 2px solid #fff;
+  padding: 5px 2px;
+}
+
+.navbar a i, .navbar a:focus i {
+  font-size: 22px;
+}
+
+.navbar a:hover, .navbar .selected, .navbar .selected:focus, .navbar li:hover > a {
+  color: #1977cc;
+  border-color: #1977cc;
 }

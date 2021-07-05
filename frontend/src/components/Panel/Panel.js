@@ -19,7 +19,7 @@ const Panel = (props) => {
           <Sidebar />
         </nav>
 
-        <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 mainHome">
           {location.pathname === '/panel' && <AppointmentsPanel />}
           {location.pathname === '/panel/uslugi' && <ServicesPanel />}
           {location.pathname === '/panel/dentysci' && <h1>Dentyści</h1>}
