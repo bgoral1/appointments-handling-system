@@ -17,7 +17,7 @@ const Hero = () => {
         </div>
         <div className="col-lg-6">
           <h1 className="display-5 fw-bold lh-1 mb-3">
-            Lorem ipsum dolor sit amet
+            Doświadczenie i precyzja
           </h1>
           <p className="lead">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

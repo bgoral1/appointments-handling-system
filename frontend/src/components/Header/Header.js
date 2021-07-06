@@ -51,7 +51,7 @@ const Header = ({isHome}) => {
           </li>
           <li>
             <NavHashLink to="/#time" activeClassName="selected"className="nav-link px-2 link-dark">
-              Godziny pracy
+              Godziny otwarcia
             </NavHashLink>
           </li>
           <li>
@@ -60,8 +60,8 @@ const Header = ({isHome}) => {
             </NavHashLink>
           </li>
           <li>
-            <NavHashLink to="/#gallery" activeClassName="selected"className="nav-link px-2 link-dark">
-              Galeria
+            <NavHashLink to="/#recommendations" activeClassName="selected"className="nav-link px-2 link-dark">
+              Rekomendacje
             </NavHashLink>
           </li>
         </ul>
