@@ -147,11 +147,11 @@ const ServicesPanel = () => {
 
   return (
     <>
-      <header>
+      <header className="header-normal">
         <h1>Usługi</h1>
         <button
           type="button"
-          className="btn btn-round"
+          className="btn btn-round btn-secondary"
           data-bs-toggle="modal"
           data-bs-target="#exampleModal"
           title="Dodaj usługę"

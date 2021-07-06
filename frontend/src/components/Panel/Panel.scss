@@ -8,11 +8,11 @@
     font-size: 2rem;
     text-align: center;
     line-height: 2rem;
-    background-color: #12f89c;
   }
-  header {
+  header.header-normal {
     display: flex;
     justify-content: space-between;
+    box-shadow: none;
   }
 }
 @media (min-width: 768px) {
