@@ -6,26 +6,26 @@ import logo from '../../assets/images/logo_zabek.png';
 import './Header.scss';
 import AuthContext from '../../context/auth-context';
 
-const Header = ({isHome}) => {
-  const { token, login, logout } = useContext(AuthContext);  
-  const [scroll, setScroll] = useState("");
+const Header = ({ isHome }) => {
+  const { token, login, logout } = useContext(AuthContext);
+  const [scroll, setScroll] = useState('');
 
   let home = '';
-  if(isHome){
+  if (isHome) {
     home = 'fixed-top';
   }
-    useEffect(()=> {
-      window.addEventListener('scroll', () => {
-        let activeClass = 'header-scrolled';
-        if(window.scrollY === 0 || !isHome){
-            activeClass = '';
-        }
-        setScroll(activeClass);
-      });
-    }, []);
+  useEffect(() => {
+    window.addEventListener('scroll', () => {
+      let activeClass = 'header-scrolled';
+      if (window.scrollY === 0 || !isHome) {
+        activeClass = '';
+      }
+      setScroll(activeClass);
+    });
+  }, []);
 
   return (
-      <header className={`border-bottom mb-4 ${home} ${scroll}`}>
+    <header className={`border-bottom mb-4 ${home} ${scroll}`}>
       <div className="container d-flex flex-wrap align-items-center justify-content-center justify-content-md-between">
         <NavLink
           to="/"
@@ -34,33 +34,57 @@ const Header = ({isHome}) => {
           <img src={logo} alt="logo" width="170px" height="72px" />
         </NavLink>
         <ul className="navbar nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-        <li>
-            <NavHashLink to="/#home" activeClassName="selected" className="nav-link px-2 link-dark">
-             <i class="bi bi-house"></i>
+          <li>
+            <NavHashLink
+              to="/#home"
+              activeClassName="selected"
+              className="nav-link px-2 link-dark"
+            >
+              <i class="bi bi-house"></i>
             </NavHashLink>
           </li>
           <li>
-            <NavHashLink to="/#about" activeClassName="selected" className="nav-link px-2 link-dark">
+            <NavHashLink
+              to="/#about"
+              activeClassName="selected"
+              className="nav-link px-2 link-dark"
+            >
               O nas
             </NavHashLink>
           </li>
           <li>
-            <NavHashLink to="/#services" activeClassName="selected"className="nav-link px-2 link-dark">
+            <NavHashLink
+              to="/#services"
+              activeClassName="selected"
+              className="nav-link px-2 link-dark"
+            >
               Usługi
             </NavHashLink>
           </li>
           <li>
-            <NavHashLink to="/#time" activeClassName="selected"className="nav-link px-2 link-dark">
+            <NavHashLink
+              to="/#time"
+              activeClassName="selected"
+              className="nav-link px-2 link-dark"
+            >
               Godziny otwarcia
             </NavHashLink>
           </li>
           <li>
-            <NavHashLink to="/#dentists" activeClassName="selected"className="nav-link px-2 link-dark">
+            <NavHashLink
+              to="/#dentists"
+              activeClassName="selected"
+              className="nav-link px-2 link-dark"
+            >
               Dentyści
             </NavHashLink>
           </li>
           <li>
-            <NavHashLink to="/#recommendations" activeClassName="selected"className="nav-link px-2 link-dark">
+            <NavHashLink
+              to="/#recommendations"
+              activeClassName="selected"
+              className="nav-link px-2 link-dark"
+            >
               Rekomendacje
             </NavHashLink>
           </li>
@@ -84,26 +108,22 @@ const Header = ({isHome}) => {
             </NavLink>
           )}
           {token && isHome && (
-            <NavLink
-              to="/panel"
-              type="button"
-              className="btn btn-primary"
-            >
+            <NavLink to="/panel" type="button" className="btn btn-primary">
               Przejdź do panelu
             </NavLink>
           )}
           {!token && (
-            <NavLink
-              to="/appointment"
+            <NavHashLink
+              to="/#appointment"
               type="button"
               className="btn btn-primary button-appointment"
             >
               Zarejstruj wizytę
-            </NavLink>
+            </NavHashLink>
           )}
         </div>
-        </div>
-      </header>
+      </div>
+    </header>
   );
 };
 
