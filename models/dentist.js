@@ -7,10 +7,6 @@ const dentistSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
-  daysOff: {
-    type: String,
-    required: true,
-  },
   workingTime: {
     type: String,
     required: true,

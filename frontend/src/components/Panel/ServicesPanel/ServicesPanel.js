@@ -57,7 +57,7 @@ const ServicesPanel = () => {
     setModal(new Modal(exampleModal.current));
   }, []);
 
-  const modalHandler = (e) => {
+  const modalHandler = (e, ref) => {
     e.preventDefault();
     const name = nameElRef.current.value;
     const price = +priceElRef.current.value;
@@ -99,6 +99,7 @@ const ServicesPanel = () => {
       .then((resData) => {
         console.log(resData);
         setServices((prev) => [...prev, resData.data.createService]);
+        ref.current.click();
       })
       .catch((err) => {
         console.log(err);

@@ -2,11 +2,13 @@ $primary: #1977cc;
 $secondary: #ffd54f;
 // $gray-light: #F8F9FA;
 $danger: #dc3545;
+$success: #33d644;
 
 $theme-colors: (
   "primary": $primary,
   "secondary": $secondary,
   "danger": $danger,
+  "success": $success,
 ) !default;
 
 @import 'bootstrap/scss/bootstrap.scss';

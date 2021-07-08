@@ -40,7 +40,6 @@ module.exports = buildSchema(`
 
     type Dentist {
       _id: ID!
-      daysOff: String!
       workingTime: String!
       user: User!
     }
@@ -59,7 +58,6 @@ module.exports = buildSchema(`
     }
 
     input DentistInput {
-      daysOff: String!
       workingTime: String!
     }
 

@@ -18,7 +18,6 @@ module.exports = {
       throw new Error('Unauthenticated');
     }
     const dentist = new Dentist({
-      daysOff: args.dentistInput.daysOff,
       workingTime: args.dentistInput.workingTime,
       user: req.userId,
     });

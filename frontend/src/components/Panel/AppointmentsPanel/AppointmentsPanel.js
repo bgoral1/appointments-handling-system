@@ -167,10 +167,11 @@ const AppointmentsPanel = () => {
   };
 
   useEffect(() => {
-    setModal(new Modal(exampleModal.current));
+    const modal = new Modal(exampleModal.current);
+    setModal(modal);
   }, []);
 
-  const modalHandler = (e) => {
+  const modalHandler = (e, ref) => {
     e.preventDefault();
     const date = dateElRef.current.value;
     const service = selectVal.service;
@@ -261,6 +262,7 @@ const AppointmentsPanel = () => {
           setAppointments((prev) =>
             [...prev, resData.data.createAppointment].sort(compare)
           );
+          ref.current.click();
         })
         .catch((err) => {
           console.log(err);
@@ -295,11 +297,9 @@ const AppointmentsPanel = () => {
       })
       .then((resData) => {
         setAppointments((prev) =>
-          prev
-            .filter((appointment) => {
-              return appointment._id !== resData.data.cancelAppointment._id;
-            })
-            .sort(compare)
+          prev.filter((appointment) => {
+            return appointment._id !== resData.data.cancelAppointment._id;
+          })
         );
       })
       .catch((err) => {

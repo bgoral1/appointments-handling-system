@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import './Modal.scss';
 
 const Modal = (props) => {
+  const closeModalRef = useRef();
+
   return (
     <div
       className="modal fade"
@@ -14,9 +16,7 @@ const Modal = (props) => {
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header bg-light">
-            <h5 className="modal-title font-weight-bold">
-              {props.title}
-            </h5>
+            <h5 className="modal-title font-weight-bold">{props.title}</h5>
             <button
               type="button"
               className="btn-close"
@@ -30,10 +30,15 @@ const Modal = (props) => {
               type="button"
               className="btn btn-secondary"
               data-bs-dismiss="modal"
+              ref={closeModalRef}
             >
               Zamknij
             </button>
-            <button type="button" className="btn btn-primary" onClick={props.onSubmit}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={(e) => props.onSubmit(e, closeModalRef)}
+            >
               Zapisz
             </button>
           </div>

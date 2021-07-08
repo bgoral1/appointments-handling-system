@@ -12,9 +12,14 @@ import d1 from '../assets/images/d1.jpg';
 import d2 from '../assets/images/d2.jpg';
 import d3 from '../assets/images/d3.jpg';
 import logo from '../assets/images/logo_zabek.png';
+import Loader from '../components/Loader/Loader';
+import Msg from '../components/Msg/Msg';
 
 const HomePage = () => {
   const [scroll, setScroll] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState(null);
+  const [feedback, setFeedback] = useState(null);
   const [dentistsData, setDentistsData] = useState([]);
   const [servicesData, setServiceData] = useState([]);
   const docImg = [d1, d2, d3];
@@ -26,6 +31,32 @@ const HomePage = () => {
   const firstNameElRef = useRef(null);
   const lastNameElRef = useRef(null);
   const phoneElRef = useRef(null);
+
+  let isValid = true;
+  let feedbackClass;
+  let validClass = "";
+  
+  if(feedback !== null ){
+    if(isValid) {
+    validClass = "is-valid";
+    feedbackClass = "valid-feedback";
+    }else if(!isValid) {
+      validClass = "is-invalid";
+      feedbackClass = "invalid-feedback";
+    }
+  }
+
+  const handleChange = (e) => {
+    e.persist();
+    setMsg(null);
+    if (e.target.id === 'selectService') {
+      setSelectVal((prev) => ({ ...prev, service: e.target.value }));
+    } else {
+      setSelectVal((prev) => ({ ...prev, dentist: e.target.value }));
+    }
+    console.log(e.target.id);
+    console.log(selectVal);
+  };
 
   useEffect(() => {
     window.addEventListener('scroll', () => {
@@ -107,6 +138,105 @@ const HomePage = () => {
         console.log(err);
       });
   }, []);
+
+  const submitHandler = (e, ref) => {
+    e.preventDefault();
+    setLoading(true);
+    const date = dateElRef.current.value;
+    const service = selectVal.service;
+    const dentist = selectVal.dentist;
+    const firstName = firstNameElRef.current.value;
+    const lastName = lastNameElRef.current.value;
+    const phone = +phoneElRef.current.value;
+    let patientId;
+
+    const requestCreatePatient = {
+      query: `
+        mutation {
+          createPatient(patientInput: {firstName: "${firstName}", lastName: "${lastName}", phone: ${phone}}){
+            _id
+            firstName
+            lastName
+            phone
+          }
+        }
+      `,
+    };
+
+    fetch('http://localhost:8000/graphql', {
+      method: 'POST',
+      body: JSON.stringify(requestCreatePatient),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error('Failed!');
+        }
+        return res.json();
+      })
+      .then((resData) => {
+        patientId = resData.data.createPatient._id;
+        const appointment = { date, service, dentist, patientId };
+        createAppointment(appointment);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    const createAppointment = (appointment) => {
+      const requestBody = {
+        query: `
+          mutation {
+            createAppointment(appointmentInput: {startTime: "${appointment.date}", patientId: "${appointment.patientId}", serviceId: "${appointment.service}", dentistId: "${appointment.dentist}"}) {
+              _id
+              dentist {
+                user {
+                  firstName
+                  lastName
+                }
+              }
+              patient {
+                firstName
+                lastName
+                phone
+              }
+              service {
+                name
+                duration
+              }
+              startTime
+              endTime
+            }
+          }
+        `,
+      };
+
+      fetch('http://localhost:8000/graphql', {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((res) => {
+          if (res.status !== 200 && res.status !== 201) {
+            throw new Error('Failed!');
+          }
+          return res.json();
+        })
+        .then(() => {
+          setLoading(false);
+          setMsg({content: 'Wizyta została zarejestrowana', isSuccess: true});
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+          setMsg({content: 'Przykro nam, ale coś poszło nie tak. Prosimy spróbować później', isSuccess: false});
+        });
+    };
+  };
 
   return (
     <>
@@ -199,8 +329,8 @@ const HomePage = () => {
                 quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea.
                 Quia fugiat sit in iste officiis commodi quidem hic quas.
               </p>
-              <form>
-                <div class="row">
+              <form onSubmit={submitHandler}>
+                <div className="row">
                   <div className="mb-3 col-sm">
                     <label htmlFor="date" className="form-label">
                       Data i godzina
@@ -208,8 +338,14 @@ const HomePage = () => {
                     <input
                       type="datetime-local"
                       id="date"
-                      className="form-control"
+                      className={`form-control ${validClass}`}
+                      min="2021-07-07T16:34"
+                      max="2021-08-14T00:00"
+                      ref={dateElRef}
                     />
+                    {feedback !== null && <div id="validationDateFeedback" className={feedbackClass}>
+                      {feedback}
+                    </div>}
                   </div>
                   <div className="mb-3 col-sm">
                     <label htmlFor="selectService" className="form-label">
@@ -219,7 +355,7 @@ const HomePage = () => {
                       content={servicesData}
                       id="selectService"
                       itemValue={selectVal.service}
-                      handleChange={null}
+                      handleChange={handleChange}
                     />
                   </div>
                   <div className="mb-3 col-sm">
@@ -230,12 +366,12 @@ const HomePage = () => {
                       content={dentistsData}
                       id="selectDentist"
                       itemValue={selectVal.dentist}
-                      handleChange={null}
+                      handleChange={handleChange}
                     />
                   </div>
                 </div>
                 <hr />
-                <div class="row">
+                <div className="row">
                   <div className="mb-3 col-sm">
                     <label htmlFor="name" className="form-label">
                       Imię
@@ -245,6 +381,7 @@ const HomePage = () => {
                       id="firstName"
                       className="form-control"
                       placeholder="np. Jan"
+                      ref={firstNameElRef}
                     />
                   </div>
                   <div className="mb-3 col-sm">
@@ -256,6 +393,7 @@ const HomePage = () => {
                       id="lastName"
                       className="form-control"
                       placeholder="np. Kowalski"
+                      ref={lastNameElRef}
                     />
                   </div>
                   <div className="mb-3 col-sm">
@@ -267,9 +405,14 @@ const HomePage = () => {
                       id="phone"
                       className="form-control"
                       placeholder="np. 985 965 964"
+                      ref={phoneElRef}
                     />
                   </div>
                 </div>
+                {loading && <Loader />}
+                {msg !== null && (
+                  <Msg msg={msg.content} isSuccess={msg.isSuccess}/>
+                )}
                 <button type="submit" className="btn btn-primary">
                   Zarejstruj
                 </button>
