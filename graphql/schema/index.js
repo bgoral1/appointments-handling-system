@@ -38,9 +38,14 @@ module.exports = buildSchema(`
       tokenExp: Int!
     }
 
+    type WorkingTime {
+      startTime: String!
+      endTime: String!
+    }
+
     type Dentist {
       _id: ID!
-      workingTime: String!
+      workingTime: [WorkingTime]!
       user: User!
     }
 
@@ -57,8 +62,14 @@ module.exports = buildSchema(`
       password: String!
     }
 
+    input WorkingTimeInput {
+      startTime: String!
+      endTime: String!
+    }
+
     input DentistInput {
-      workingTime: String!
+      userId: String!
+      workingTime: [WorkingTimeInput]!
     }
 
     input ServiceInput {

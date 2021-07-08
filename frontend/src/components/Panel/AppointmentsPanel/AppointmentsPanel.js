@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import moment from 'moment';
 import { Modal } from 'bootstrap';
 
 import AuthContext from '../../../context/auth-context';
@@ -332,6 +333,8 @@ const AppointmentsPanel = () => {
               </label>
               <input
                 type="datetime-local"
+                min={moment().add(1, 'days').format('YYYY-MM-DD') + 'T00:00'}
+                max={moment().add(60, 'days').format('YYYY-MM-DD') + 'T00:00'}
                 id="date"
                 ref={dateElRef}
                 className="form-control"

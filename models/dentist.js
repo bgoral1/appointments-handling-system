@@ -8,7 +8,12 @@ const dentistSchema = new Schema({
     ref: 'User',
   },
   workingTime: {
-    type: String,
+    type: [
+      {
+        startTime: String,
+        endTime: String,
+      },
+    ],
     required: true,
   },
 });

@@ -14,12 +14,12 @@ module.exports = {
       });
   },
   createDentist: (args, req) => {
-    if (!req.isAuth) {
-      throw new Error('Unauthenticated');
-    }
+    // if (!req.isAuth) {
+    //   throw new Error('Unauthenticated');
+    // }
     const dentist = new Dentist({
+      user: args.dentistInput.userId,
       workingTime: args.dentistInput.workingTime,
-      user: req.userId,
     });
 
     // !!! Add prevention from saving another dentist with the same user

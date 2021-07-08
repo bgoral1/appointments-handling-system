@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavHashLink } from 'react-router-hash-link';
-
+import moment from 'moment';
+import 'moment/locale/pl';
 import './HomePage.scss';
 
 import Header from '../components/Header/Header';
@@ -16,6 +17,7 @@ import Loader from '../components/Loader/Loader';
 import Msg from '../components/Msg/Msg';
 
 const HomePage = () => {
+  moment.locale();
   const [scroll, setScroll] = useState('');
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
@@ -34,15 +36,15 @@ const HomePage = () => {
 
   let isValid = true;
   let feedbackClass;
-  let validClass = "";
-  
-  if(feedback !== null ){
-    if(isValid) {
-    validClass = "is-valid";
-    feedbackClass = "valid-feedback";
-    }else if(!isValid) {
-      validClass = "is-invalid";
-      feedbackClass = "invalid-feedback";
+  let validClass = '';
+
+  if (feedback !== null) {
+    if (isValid) {
+      validClass = 'is-valid';
+      feedbackClass = 'valid-feedback';
+    } else if (!isValid) {
+      validClass = 'is-invalid';
+      feedbackClass = 'invalid-feedback';
     }
   }
 
@@ -66,6 +68,8 @@ const HomePage = () => {
       }
       setScroll(activeClass);
     });
+    console.log(moment(new Date()).format('dddd'));
+    console.log(moment(new Date()).day());
   }, []);
 
   useEffect(() => {
@@ -228,12 +232,16 @@ const HomePage = () => {
         })
         .then(() => {
           setLoading(false);
-          setMsg({content: 'Wizyta została zarejestrowana', isSuccess: true});
+          setMsg({ content: 'Wizyta została zarejestrowana', isSuccess: true });
         })
         .catch((err) => {
           console.log(err);
           setLoading(false);
-          setMsg({content: 'Przykro nam, ale coś poszło nie tak. Prosimy spróbować później', isSuccess: false});
+          setMsg({
+            content:
+              'Przykro nam, ale coś poszło nie tak. Prosimy spróbować później',
+            isSuccess: false,
+          });
         });
     };
   };
@@ -289,7 +297,7 @@ const HomePage = () => {
                 <ul className="list-group">
                   <li className="list-group-item list-group-item-secondary fw-bold d-flex justify-content-between align-items-center">
                     Nazwa usługi
-                    <span className="badge bg-primary rounded-pill">Cena</span>
+                    <span className="w-25">Cena</span>
                   </li>
                   {servicesData &&
                     servicesData.map((service) => (
@@ -298,24 +306,11 @@ const HomePage = () => {
                         key={service._id}
                       >
                         {service.name}
-                        <span className="badge bg-primary rounded-pill">{`${service.price} zł`}</span>
+                        <span className="badge bg-primary w-25">{`${service.price} zł`}</span>
                       </li>
                     ))}
                 </ul>
               </div>
-            </div>
-          </div>
-        </section>
-        <section id="time">
-          <div className="container">
-            <div className="section-title">
-              <h2>Godziny otwarcia</h2>
-              <p>
-                Magnam dolores commodi suscipit. Necessitatibus eius consequatur
-                ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam
-                quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea.
-                Quia fugiat sit in iste officiis commodi quidem hic quas.
-              </p>
             </div>
           </div>
         </section>
@@ -339,13 +334,22 @@ const HomePage = () => {
                       type="datetime-local"
                       id="date"
                       className={`form-control ${validClass}`}
-                      min="2021-07-07T16:34"
-                      max="2021-08-14T00:00"
+                      min={
+                        moment().add(1, 'days').format('YYYY-MM-DD') + 'T00:00'
+                      }
+                      max={
+                        moment().add(60, 'days').format('YYYY-MM-DD') + 'T00:00'
+                      }
                       ref={dateElRef}
                     />
-                    {feedback !== null && <div id="validationDateFeedback" className={feedbackClass}>
-                      {feedback}
-                    </div>}
+                    {feedback !== null && (
+                      <div
+                        id="validationDateFeedback"
+                        className={feedbackClass}
+                      >
+                        {feedback}
+                      </div>
+                    )}
                   </div>
                   <div className="mb-3 col-sm">
                     <label htmlFor="selectService" className="form-label">
@@ -411,12 +415,69 @@ const HomePage = () => {
                 </div>
                 {loading && <Loader />}
                 {msg !== null && (
-                  <Msg msg={msg.content} isSuccess={msg.isSuccess}/>
+                  <Msg msg={msg.content} isSuccess={msg.isSuccess} />
                 )}
                 <button type="submit" className="btn btn-primary">
                   Zarejstruj
                 </button>
               </form>
+            </div>
+          </div>
+        </section>
+        <section id="time">
+          <div className="container">
+            <div className="section-title">
+              <h2>Godziny otwarcia</h2>
+              <p>
+                Magnam dolores commodi suscipit. Necessitatibus eius consequatur
+                ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam
+                quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea.
+                Quia fugiat sit in iste officiis commodi quidem hic quas.
+              </p>
+              <div className="w-25 pt-5 m-auto">
+                <ul className="list-group">
+                  <li className="list-group-item d-flex justify-content-between align-items-center">
+                    Poniedziałek
+                    <span className="badge bg-success">
+                      8:00 - 16:00
+                    </span>
+                  </li>
+                  <li className="list-group-item d-flex justify-content-between align-items-center">
+                    Wtorek
+                    <span className="badge bg-success">
+                      8:00 - 16:00
+                    </span>
+                  </li>
+                  <li className="list-group-item d-flex justify-content-between align-items-center">
+                    Środa
+                    <span className="badge bg-success">
+                      8:00 - 16:00
+                    </span>
+                  </li>
+                  <li className="list-group-item d-flex justify-content-between align-items-center">
+                    Czwartek
+                    <span className="badge bg-success">
+                      8:00 - 16:00
+                    </span>
+                  </li>
+                  <li className="list-group-item d-flex justify-content-between align-items-center">
+                    Piątek
+                    <span className="badge bg-success">
+                      8:00 - 16:00
+                    </span>
+                  </li>
+                  <li className="list-group-item d-flex justify-content-between align-items-center">
+                    Sobota
+                    <span className="badge bg-danger">
+                      zamknięte
+                    </span>
+                  </li>
+                  <li className="list-group-item d-flex justify-content-between align-items-center">
+                    Niedziela
+                    <span className="badge bg-danger">zamknięte</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>

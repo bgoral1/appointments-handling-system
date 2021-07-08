@@ -5,9 +5,9 @@ const User = require('../../models/user');
 
 module.exports = {
   createUser: (args, req) => {
-    if (!req.isAuth) {
-      throw new Error('Unauthenticated');
-    }
+    // if (!req.isAuth) {
+    //   throw new Error('Unauthenticated');
+    // }
     return User.findOne({ login: args.userInput.login }).then((user) => {
       if (user) {
         throw new Error('User with this login already exist.');
