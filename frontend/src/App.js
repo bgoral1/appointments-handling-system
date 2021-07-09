@@ -46,6 +46,9 @@ const App = () => {
               {user.token && (
                 <Route path="/panel/dentysci" component={PanelPage} />
               )}
+              {user.token && (
+                <Route path="/panel/pacjenci" component={PanelPage} />
+              )}
             </Switch>
           </main>
         </AuthContext.Provider>

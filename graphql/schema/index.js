@@ -97,6 +97,7 @@ module.exports = buildSchema(`
       createService(serviceInput: ServiceInput): Service
       deleteService(serviceId: ID!): Service
       createPatient(patientInput: PatientInput): Patient
+      deletePatient(patientId: ID!): Patient
       createUser(userInput: UserInput): User
       createDentist(dentistInput: DentistInput): Dentist
       createAppointment(appointmentInput: AppointmentInput): Appointment!

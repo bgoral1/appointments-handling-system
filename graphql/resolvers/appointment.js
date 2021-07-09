@@ -28,9 +28,6 @@ const transformAppointment = (appointment) => {
 
 module.exports = {
   appointments: (args, req) => {
-    if (!req.isAuth) {
-      throw new Error('Unauthenticated');
-    }
     return Appointment.find()
       .then((appointments) => {
         return appointments.map((appointment) => {

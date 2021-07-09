@@ -34,4 +34,16 @@ module.exports = {
         throw err;
       });
   },
+  deletePatient: async (args, req) => {
+    if (!req.isAuth) {
+      throw new Error('Unauthenticated');
+    }
+    try {
+      const patient = await Patient.findById(args.patientId);
+      await Patient.deleteOne({ _id: args.patientId });
+      return patient;
+    } catch (err) {
+      throw err;
+    }
+  },
 };

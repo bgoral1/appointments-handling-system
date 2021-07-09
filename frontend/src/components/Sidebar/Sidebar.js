@@ -26,6 +26,11 @@ const Sidebar = () => {
             Dentyści
           </NavLink>
         </li>
+        <li>
+          <NavLink to="/panel/pacjenci" className="nav-link link-dark">
+            Pacjenci
+          </NavLink>
+        </li>
       </ul>
       <hr />
       <div className="dropdown">
