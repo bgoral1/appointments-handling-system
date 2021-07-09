@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import calendar from '../../assets/icons/calendar.png';
 
 import './Sidebar.scss';
 
+import AuthContext from '../../context/auth-context';
+
 const Sidebar = () => {
+  const { logout } = useContext(AuthContext);
+
   return (
     <div className="d-flex flex-column flex-shrink-0 p-3">
       <ul className="nav nav-pills flex-column mb-auto">
         <li className="nav-item">
           <NavLink to="/panel" exact className="nav-link link-dark">
-            {/* <img src={calendar} alt="Calendar icon" width="24" height="24" /> */}
             Zarezerwowane wizyty
           </NavLink>
         </li>
@@ -27,8 +29,8 @@ const Sidebar = () => {
       </ul>
       <hr />
       <div className="dropdown">
-        <a
-          href="#"
+        <NavLink
+          to="#"
           className="d-flex align-items-center link-dark text-decoration-none dropdown-toggle"
           id="dropdownUser2"
           data-bs-toggle="dropdown"
@@ -42,23 +44,23 @@ const Sidebar = () => {
             className="rounded-circle me-2"
           />
           <strong>mdo</strong>
-        </a>
+        </NavLink>
         <ul
           className="dropdown-menu text-small shadow"
           aria-labelledby="dropdownUser2"
         >
           <li>
-            <a className="dropdown-item" href="#">
+            <NavLink to="#" className="dropdown-item" href="#">
               Profile
-            </a>
+            </NavLink>
           </li>
           <li>
             <hr className="dropdown-divider" />
           </li>
           <li>
-            <a className="dropdown-item" href="#">
+            <NavLink to="#" className="dropdown-item" onClick={logout}>
               Sign out
-            </a>
+            </NavLink>
           </li>
         </ul>
       </div>

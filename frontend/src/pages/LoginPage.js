@@ -7,7 +7,7 @@ import './Login.scss';
 import AuthContext from '../context/auth-context';
 
 const LoginPage = () => {
-  const { token, userId, login, logout } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const loginInput = useRef(null);
   const passwordInput = useRef(null);
 

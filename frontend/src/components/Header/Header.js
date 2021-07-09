@@ -7,7 +7,7 @@ import './Header.scss';
 import AuthContext from '../../context/auth-context';
 
 const Header = ({ isHome }) => {
-  const { token, login, logout } = useContext(AuthContext);
+  const { token, logout } = useContext(AuthContext);
   const [scroll, setScroll] = useState('');
 
   let home = '';
@@ -22,7 +22,7 @@ const Header = ({ isHome }) => {
       }
       setScroll(activeClass);
     });
-  }, []);
+  }, [isHome]);
 
   return (
     <header className={`border-bottom mb-4 ${home} ${scroll}`}>

@@ -67,8 +67,6 @@ const ServicesPanel = () => {
       return;
     }
 
-    const service = { name, price, duration };
-
     const requestBody = {
       query: `
         mutation {

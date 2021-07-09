@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavHashLink } from 'react-router-hash-link';
-import moment from 'moment';
-import 'moment/locale/pl';
+import Moment from 'moment';
+import { extendMoment } from 'moment-range';
+
 import './HomePage.scss';
 
 import Header from '../components/Header/Header';
@@ -17,11 +18,10 @@ import Loader from '../components/Loader/Loader';
 import Msg from '../components/Msg/Msg';
 
 const HomePage = () => {
-  moment.locale();
   const [scroll, setScroll] = useState('');
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
-  const [feedback, setFeedback] = useState(null);
+  const [appointments, setAppointments] = useState([]);
   const [dentistsData, setDentistsData] = useState([]);
   const [servicesData, setServiceData] = useState([]);
   const docImg = [d1, d2, d3];
@@ -34,19 +34,7 @@ const HomePage = () => {
   const lastNameElRef = useRef(null);
   const phoneElRef = useRef(null);
 
-  let isValid = true;
-  let feedbackClass;
-  let validClass = '';
-
-  if (feedback !== null) {
-    if (isValid) {
-      validClass = 'is-valid';
-      feedbackClass = 'valid-feedback';
-    } else if (!isValid) {
-      validClass = 'is-invalid';
-      feedbackClass = 'invalid-feedback';
-    }
-  }
+  const moment = extendMoment(Moment);
 
   const handleChange = (e) => {
     e.persist();
@@ -68,8 +56,6 @@ const HomePage = () => {
       }
       setScroll(activeClass);
     });
-    console.log(moment(new Date()).format('dddd'));
-    console.log(moment(new Date()).day());
   }, []);
 
   useEffect(() => {
@@ -78,6 +64,10 @@ const HomePage = () => {
           query{
             dentists{
               _id
+              workingTime{
+                startTime
+                endTime
+              }
               user{
                 firstName
                 lastName
@@ -143,57 +133,11 @@ const HomePage = () => {
       });
   }, []);
 
-  const submitHandler = (e, ref) => {
-    e.preventDefault();
-    setLoading(true);
-    const date = dateElRef.current.value;
-    const service = selectVal.service;
-    const dentist = selectVal.dentist;
-    const firstName = firstNameElRef.current.value;
-    const lastName = lastNameElRef.current.value;
-    const phone = +phoneElRef.current.value;
-    let patientId;
-
-    const requestCreatePatient = {
+  useEffect(() => {
+    const requestBody = {
       query: `
-        mutation {
-          createPatient(patientInput: {firstName: "${firstName}", lastName: "${lastName}", phone: ${phone}}){
-            _id
-            firstName
-            lastName
-            phone
-          }
-        }
-      `,
-    };
-
-    fetch('http://localhost:8000/graphql', {
-      method: 'POST',
-      body: JSON.stringify(requestCreatePatient),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed!');
-        }
-        return res.json();
-      })
-      .then((resData) => {
-        patientId = resData.data.createPatient._id;
-        const appointment = { date, service, dentist, patientId };
-        createAppointment(appointment);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    const createAppointment = (appointment) => {
-      const requestBody = {
-        query: `
-          mutation {
-            createAppointment(appointmentInput: {startTime: "${appointment.date}", patientId: "${appointment.patientId}", serviceId: "${appointment.service}", dentistId: "${appointment.dentist}"}) {
+          query{
+            appointments {
               _id
               dentist {
                 user {
@@ -208,42 +152,223 @@ const HomePage = () => {
               }
               service {
                 name
-                duration
               }
               startTime
               endTime
             }
           }
         `,
-      };
-
-      fetch('http://localhost:8000/graphql', {
-        method: 'POST',
-        body: JSON.stringify(requestBody),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((res) => {
-          if (res.status !== 200 && res.status !== 201) {
-            throw new Error('Failed!');
-          }
-          return res.json();
-        })
-        .then(() => {
-          setLoading(false);
-          setMsg({ content: 'Wizyta została zarejestrowana', isSuccess: true });
-        })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-          setMsg({
-            content:
-              'Przykro nam, ale coś poszło nie tak. Prosimy spróbować później',
-            isSuccess: false,
-          });
-        });
     };
+
+    fetch('http://localhost:8000/graphql', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error('Failed!');
+        }
+        return res.json();
+      })
+      .then((resData) => {
+        setAppointments(resData.data.appointments);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  const isTimeBetween = (startTime, endTime, selectedTime) => {
+    let start = moment(startTime, 'H:mm');
+    let end = moment(endTime, 'H:mm');
+    let selected = moment(selectedTime, 'H:mm');
+    if (end < start) {
+      return (
+        (selected >= start && selected <= moment('23:59:59', 'h:mm:ss')) ||
+        (selected >= moment('0:00:00', 'h:mm:ss') && selected < end)
+      );
+    }
+    return selected >= start && selected < end;
+  };
+
+  const submitHandler = (e, ref) => {
+    e.preventDefault();
+    setMsg(null);
+    setLoading(true);
+    const date = dateElRef.current.value;
+    const service = selectVal.service;
+    const dentist = selectVal.dentist;
+    const firstName = firstNameElRef.current.value;
+    const lastName = lastNameElRef.current.value;
+    const phone = +phoneElRef.current.value;
+
+    if (
+      date === '' ||
+      service === '' ||
+      dentist === '' ||
+      firstName === '' ||
+      lastName === '' ||
+      phone === 0
+    ) {
+      setLoading(false);
+      setMsg({ content: 'Prosimy wypełnić wszystkie pola', isSuccess: false });
+    } else {
+      const day = moment(date).day();
+      const selectedDentist = dentistsData.filter((obj) => {
+        return obj._id === dentist;
+      });
+      const selectedService = servicesData.filter((obj) => {
+        return obj._id === service;
+      });
+      const selectedRange = moment.range(
+        date,
+        moment(date).add(selectedService[0].duration, 'm').toDate()
+      );
+      const sameAppointment = appointments.find((obj) =>
+        selectedRange.overlaps(moment.range(obj.startTime, obj.endTime))
+      );
+
+      if (day === 6 || day === 0) {
+        setLoading(false);
+        setMsg({
+          content:
+            'W weekendy nasz gabinet jest zamknięty, prosimy zmienić termin.',
+          isSuccess: false,
+        });
+      } else if (
+        isTimeBetween('8:00', '16:00', moment(date).format('HH:mm:ss')) !== true
+      ) {
+        setLoading(false);
+        setMsg({
+          content:
+            'Gabinet czynny jest w godzinach 8:00 - 16:00. Prosimy zmienić czas wizyty.',
+          isSuccess: false,
+        });
+      } else if (selectedDentist[0].workingTime[day] === null) {
+        setLoading(false);
+        setMsg({
+          content: 'Wybrany dentysta nie przyjmuje w wybranym dniu tygodnia.',
+          isSuccess: false,
+        });
+      } else if (
+        isTimeBetween(
+          selectedDentist[0].workingTime[day].startTime,
+          selectedDentist[0].workingTime[day].endTime,
+          moment(date).format('HH:mm:ss')
+        ) !== true
+      ) {
+        setLoading(false);
+        setMsg({
+          content: 'Wybrany dentysta nie przyjmuje w tych godzinach.',
+          isSuccess: false,
+        });
+      } else if (sameAppointment) {
+        setLoading(false);
+        setMsg({ content: 'Wybrany termin jest zajęty.', isSuccess: false });
+      } else {
+        let patientId;
+
+        const requestCreatePatient = {
+          query: `
+            mutation {
+              createPatient(patientInput: {firstName: "${firstName}", lastName: "${lastName}", phone: ${phone}}){
+                _id
+                firstName
+                lastName
+                phone
+              }
+            }
+          `,
+        };
+
+        fetch('http://localhost:8000/graphql', {
+          method: 'POST',
+          body: JSON.stringify(requestCreatePatient),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then((res) => {
+            if (res.status !== 200 && res.status !== 201) {
+              throw new Error('Failed!');
+            }
+            return res.json();
+          })
+          .then((resData) => {
+            patientId = resData.data.createPatient._id;
+            const appointment = { date, service, dentist, patientId };
+            createAppointment(appointment);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
+        const createAppointment = (appointment) => {
+          const requestBody = {
+            query: `
+              mutation {
+                createAppointment(appointmentInput: {startTime: "${appointment.date}", patientId: "${appointment.patientId}", serviceId: "${appointment.service}", dentistId: "${appointment.dentist}"}) {
+                  _id
+                  dentist {
+                    user {
+                      firstName
+                      lastName
+                    }
+                  }
+                  patient {
+                    firstName
+                    lastName
+                    phone
+                  }
+                  service {
+                    name
+                    duration
+                  }
+                  startTime
+                  endTime
+                }
+              }
+            `,
+          };
+
+          fetch('http://localhost:8000/graphql', {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+            .then((res) => {
+              if (res.status !== 200 && res.status !== 201) {
+                throw new Error('Failed!');
+              }
+              return res.json();
+            })
+            .then((resData) => {
+              setLoading(false);
+              setAppointments((prev) => [
+                ...prev,
+                resData.data.createAppointment,
+              ]);
+              setMsg({
+                content: 'Wizyta została zarejestrowana',
+                isSuccess: true,
+              });
+            })
+            .catch((err) => {
+              setLoading(false);
+              setMsg({
+                content:
+                  'Przykro nam, ale coś poszło nie tak. Prosimy spróbować później',
+                isSuccess: false,
+              });
+            });
+        };
+      }
+    }
   };
 
   return (
@@ -333,7 +458,7 @@ const HomePage = () => {
                     <input
                       type="datetime-local"
                       id="date"
-                      className={`form-control ${validClass}`}
+                      className="form-control"
                       min={
                         moment().add(1, 'days').format('YYYY-MM-DD') + 'T00:00'
                       }
@@ -342,14 +467,6 @@ const HomePage = () => {
                       }
                       ref={dateElRef}
                     />
-                    {feedback !== null && (
-                      <div
-                        id="validationDateFeedback"
-                        className={feedbackClass}
-                      >
-                        {feedback}
-                      </div>
-                    )}
                   </div>
                   <div className="mb-3 col-sm">
                     <label htmlFor="selectService" className="form-label">
@@ -438,39 +555,27 @@ const HomePage = () => {
                 <ul className="list-group">
                   <li className="list-group-item d-flex justify-content-between align-items-center">
                     Poniedziałek
-                    <span className="badge bg-success">
-                      8:00 - 16:00
-                    </span>
+                    <span className="badge bg-success">8:00 - 16:00</span>
                   </li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">
                     Wtorek
-                    <span className="badge bg-success">
-                      8:00 - 16:00
-                    </span>
+                    <span className="badge bg-success">8:00 - 16:00</span>
                   </li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">
                     Środa
-                    <span className="badge bg-success">
-                      8:00 - 16:00
-                    </span>
+                    <span className="badge bg-success">8:00 - 16:00</span>
                   </li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">
                     Czwartek
-                    <span className="badge bg-success">
-                      8:00 - 16:00
-                    </span>
+                    <span className="badge bg-success">8:00 - 16:00</span>
                   </li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">
                     Piątek
-                    <span className="badge bg-success">
-                      8:00 - 16:00
-                    </span>
+                    <span className="badge bg-success">8:00 - 16:00</span>
                   </li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">
                     Sobota
-                    <span className="badge bg-danger">
-                      zamknięte
-                    </span>
+                    <span className="badge bg-danger">zamknięte</span>
                   </li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">
                     Niedziela
@@ -554,16 +659,16 @@ const HomePage = () => {
                 <h4>Informacje</h4>
                 <ul>
                   <li>
-                    <a href="#">O nas</a>
+                    <NavHashLink to="/#about">O nas</NavHashLink>
                   </li>
                   <li>
-                    <a href="#">Usługi</a>
+                    <NavHashLink to="/#services">Usługi</NavHashLink>
                   </li>
                   <li>
-                    <a href="#">Regulamin</a>
+                    <NavHashLink to="/#">Regulamin</NavHashLink>
                   </li>
                   <li>
-                    <a href="#">Polityka Prywatności</a>
+                    <NavHashLink to="/#">Polityka Prywatności</NavHashLink>
                   </li>
                 </ul>
               </div>
@@ -572,16 +677,16 @@ const HomePage = () => {
                 <h4>Oferta</h4>
                 <ul>
                   <li>
-                    <a href="#">Wybielanie zębów</a>
+                    <NavHashLink to="/#services">Wybielanie zębów</NavHashLink>
                   </li>
                   <li>
-                    <a href="#">Leczenie zębów</a>
+                    <NavHashLink to="/#services">Leczenie zębów</NavHashLink>
                   </li>
                   <li>
-                    <a href="#">Implantacja</a>
+                    <NavHashLink to="/#services">Implantacja</NavHashLink>
                   </li>
                   <li>
-                    <a href="#">Protetyka</a>
+                    <NavHashLink to="/#services">Protetyka</NavHashLink>
                   </li>
                 </ul>
               </div>

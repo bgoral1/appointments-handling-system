@@ -9,7 +9,7 @@ const Hero = () => {
           <img
             src={hero}
             className="d-block mx-lg-auto img-fluid"
-            alt="Przychodnia Ząbek - hero image"
+            alt="Przychodnia Ząbek - hero"
             width="700"
             height="500"
             loading="lazy"

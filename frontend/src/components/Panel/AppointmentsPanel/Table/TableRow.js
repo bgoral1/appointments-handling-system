@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 
 const TableRow = (props) => {
   const { content, index, handleDelete } = props;
@@ -6,7 +7,7 @@ const TableRow = (props) => {
   return (
     <tr>
       <td>{index + 1}</td>
-      <td>{content.startTime}</td>
+      <td>{moment(content.startTime).format('DD-MM-YYYY HH:mm')}</td>
       <td>{content.patient.lastName + ' ' + content.patient.firstName}</td>
       <td>{content.patient.phone}</td>
       <td>{content.service.name}</td>

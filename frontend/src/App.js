@@ -1,9 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
 import './App.css';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
-import AppointmentPage from './pages/AppointmentPage';
 import PanelPage from './pages/PanelPage';
 import AuthContext from './context/auth-context';
 
