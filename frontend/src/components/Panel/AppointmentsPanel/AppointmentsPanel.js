@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import Moment from 'moment';
-import { extendMoment } from 'moment-range';
+import moment from 'moment';
 import { Modal } from 'bootstrap';
 
+import { isTimeBetween } from '../../../helpers/dateRange/isTimeBetween';
 import AuthContext from '../../../context/auth-context';
 import ModalComp from '../../Modal/Modal';
 import Table from './Table/Table';
@@ -28,21 +28,6 @@ const AppointmentsPanel = () => {
   const lastNameElRef = useRef(null);
   const phoneElRef = useRef(null);
 
-  const moment = extendMoment(Moment);
-
-  const isTimeBetween = (startTime, endTime, selectedTime) => {
-    let start = moment(startTime, 'H:mm');
-    let end = moment(endTime, 'H:mm');
-    let selected = moment(selectedTime, 'H:mm');
-    if (end < start) {
-      return (
-        (selected >= start && selected <= moment('23:59:59', 'h:mm:ss')) ||
-        (selected >= moment('0:00:00', 'h:mm:ss') && selected < end)
-      );
-    }
-    return selected >= start && selected < end;
-  };
-
   const handleChange = (e) => {
     e.persist();
     if (e.target.id === 'selectService') {
@@ -50,8 +35,6 @@ const AppointmentsPanel = () => {
     } else {
       setSelectVal((prev) => ({ ...prev, dentist: e.target.value }));
     }
-    console.log(e.target.id);
-    console.log(selectVal);
   };
 
   useEffect(() => {

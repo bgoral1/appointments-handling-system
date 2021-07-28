@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavHashLink } from 'react-router-hash-link';
-import Moment from 'moment';
-import { extendMoment } from 'moment-range';
+import moment from 'moment';
 
 import './HomePage.scss';
 
+import { useFetchData } from '../customHooks/useFetchData';
+import { isTimeBetween } from '../helpers/dateRange/isTimeBetween';
 import Header from '../components/Header/Header';
 import TopBar from '../components/TopBar/TopBar';
 import Hero from '../components/HeroSection/Hero';
@@ -22,8 +23,6 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
   const [appointments, setAppointments] = useState([]);
-  const [dentistsData, setDentistsData] = useState([]);
-  const [servicesData, setServiceData] = useState([]);
   const docImg = [d1, d2, d3];
   const dateElRef = useRef(null);
   const [selectVal, setSelectVal] = useState({
@@ -34,8 +33,6 @@ const HomePage = () => {
   const lastNameElRef = useRef(null);
   const phoneElRef = useRef(null);
 
-  const moment = extendMoment(Moment);
-
   const handleChange = (e) => {
     e.persist();
     setMsg(null);
@@ -44,8 +41,6 @@ const HomePage = () => {
     } else {
       setSelectVal((prev) => ({ ...prev, dentist: e.target.value }));
     }
-    console.log(e.target.id);
-    console.log(selectVal);
   };
 
   useEffect(() => {
@@ -58,80 +53,34 @@ const HomePage = () => {
     });
   }, []);
 
-  useEffect(() => {
-    const requestBody = {
-      query: `
-          query{
-            dentists{
-              _id
-              workingTime{
-                startTime
-                endTime
-              }
-              user{
-                firstName
-                lastName
-              }
-            }
-          }
-          `,
-    };
+  const queryDentists = `
+  query{
+    dentists{
+      _id
+      workingTime{
+        startTime
+        endTime
+      }
+      user{
+        firstName
+        lastName
+      }
+    }
+  }
+  `;
+  const { dentists } = useFetchData(queryDentists);
 
-    fetch('http://localhost:8000/graphql', {
-      method: 'POST',
-      body: JSON.stringify(requestBody),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed!');
-        }
-        return res.json();
-      })
-      .then((resData) => {
-        setDentistsData(resData.data.dentists);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  useEffect(() => {
-    const requestBody = {
-      query: `
-            query{
-              services{
-                _id
-                name
-                price
-                duration
-              }
-            }
-          `,
-    };
-
-    fetch('http://localhost:8000/graphql', {
-      method: 'POST',
-      body: JSON.stringify(requestBody),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed!');
-        }
-        return res.json();
-      })
-      .then((resData) => {
-        setServiceData(resData.data.services);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  const queryServices = `
+  query{
+    services{
+      _id
+      name
+      price
+      duration
+    }
+  }
+`;
+  const { services } = useFetchData(queryServices);
 
   useEffect(() => {
     const requestBody = {
@@ -181,19 +130,6 @@ const HomePage = () => {
       });
   }, []);
 
-  const isTimeBetween = (startTime, endTime, selectedTime) => {
-    let start = moment(startTime, 'H:mm');
-    let end = moment(endTime, 'H:mm');
-    let selected = moment(selectedTime, 'H:mm');
-    if (end < start) {
-      return (
-        (selected >= start && selected <= moment('23:59:59', 'h:mm:ss')) ||
-        (selected >= moment('0:00:00', 'h:mm:ss') && selected < end)
-      );
-    }
-    return selected >= start && selected < end;
-  };
-
   const submitHandler = (e, ref) => {
     e.preventDefault();
     setMsg(null);
@@ -217,10 +153,10 @@ const HomePage = () => {
       setMsg({ content: 'Prosimy wypełnić wszystkie pola', isSuccess: false });
     } else {
       const day = moment(date).day();
-      const selectedDentist = dentistsData.filter((obj) => {
+      const selectedDentist = dentists.filter((obj) => {
         return obj._id === dentist;
       });
-      const selectedService = servicesData.filter((obj) => {
+      const selectedService = services.filter((obj) => {
         return obj._id === service;
       });
       const selectedRange = moment.range(
@@ -424,8 +360,8 @@ const HomePage = () => {
                     Nazwa usługi
                     <span className="w-25">Cena</span>
                   </li>
-                  {servicesData &&
-                    servicesData.map((service) => (
+                  {services &&
+                    services.map((service) => (
                       <li
                         className="list-group-item d-flex justify-content-between align-items-center"
                         key={service._id}
@@ -449,95 +385,99 @@ const HomePage = () => {
                 quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea.
                 Quia fugiat sit in iste officiis commodi quidem hic quas.
               </p>
-              <form onSubmit={submitHandler}>
-                <div className="row">
-                  <div className="mb-3 col-sm">
-                    <label htmlFor="date" className="form-label">
-                      Data i godzina
-                    </label>
-                    <input
-                      type="datetime-local"
-                      id="date"
-                      className="form-control"
-                      min={
-                        moment().add(1, 'days').format('YYYY-MM-DD') + 'T00:00'
-                      }
-                      max={
-                        moment().add(60, 'days').format('YYYY-MM-DD') + 'T00:00'
-                      }
-                      ref={dateElRef}
-                    />
+              {dentists && services && (
+                <form onSubmit={submitHandler}>
+                  <div className="row">
+                    <div className="mb-3 col-sm">
+                      <label htmlFor="date" className="form-label">
+                        Data i godzina
+                      </label>
+                      <input
+                        type="datetime-local"
+                        id="date"
+                        className="form-control"
+                        min={
+                          moment().add(1, 'days').format('YYYY-MM-DD') +
+                          'T00:00'
+                        }
+                        max={
+                          moment().add(60, 'days').format('YYYY-MM-DD') +
+                          'T00:00'
+                        }
+                        ref={dateElRef}
+                      />
+                    </div>
+                    <div className="mb-3 col-sm">
+                      <label htmlFor="selectService" className="form-label">
+                        Rodzaj wizyty
+                      </label>
+                      <Select
+                        content={services}
+                        id="selectService"
+                        itemValue={selectVal.service}
+                        handleChange={handleChange}
+                      />
+                    </div>
+                    <div className="mb-3 col-sm">
+                      <label htmlFor="selectDentist" className="form-label">
+                        Dentysta
+                      </label>
+                      <Select
+                        content={dentists}
+                        id="selectDentist"
+                        itemValue={selectVal.dentist}
+                        handleChange={handleChange}
+                      />
+                    </div>
                   </div>
-                  <div className="mb-3 col-sm">
-                    <label htmlFor="selectService" className="form-label">
-                      Rodzaj wizyty
-                    </label>
-                    <Select
-                      content={servicesData}
-                      id="selectService"
-                      itemValue={selectVal.service}
-                      handleChange={handleChange}
-                    />
+                  <hr />
+                  <div className="row">
+                    <div className="mb-3 col-sm">
+                      <label htmlFor="name" className="form-label">
+                        Imię
+                      </label>
+                      <input
+                        type="name"
+                        id="firstName"
+                        className="form-control"
+                        placeholder="np. Jan"
+                        ref={firstNameElRef}
+                      />
+                    </div>
+                    <div className="mb-3 col-sm">
+                      <label htmlFor="lastName" className="form-label">
+                        Nazwisko
+                      </label>
+                      <input
+                        type="name"
+                        id="lastName"
+                        className="form-control"
+                        placeholder="np. Kowalski"
+                        ref={lastNameElRef}
+                      />
+                    </div>
+                    <div className="mb-3 col-sm">
+                      <label htmlFor="phone" className="form-label">
+                        Telefon
+                      </label>
+                      <input
+                        type="number"
+                        id="phone"
+                        className="form-control"
+                        placeholder="np. 985 965 964"
+                        ref={phoneElRef}
+                      />
+                    </div>
                   </div>
-                  <div className="mb-3 col-sm">
-                    <label htmlFor="selectDentist" className="form-label">
-                      Dentysta
-                    </label>
-                    <Select
-                      content={dentistsData}
-                      id="selectDentist"
-                      itemValue={selectVal.dentist}
-                      handleChange={handleChange}
-                    />
-                  </div>
-                </div>
-                <hr />
-                <div className="row">
-                  <div className="mb-3 col-sm">
-                    <label htmlFor="name" className="form-label">
-                      Imię
-                    </label>
-                    <input
-                      type="name"
-                      id="firstName"
-                      className="form-control"
-                      placeholder="np. Jan"
-                      ref={firstNameElRef}
-                    />
-                  </div>
-                  <div className="mb-3 col-sm">
-                    <label htmlFor="lastName" className="form-label">
-                      Nazwisko
-                    </label>
-                    <input
-                      type="name"
-                      id="lastName"
-                      className="form-control"
-                      placeholder="np. Kowalski"
-                      ref={lastNameElRef}
-                    />
-                  </div>
-                  <div className="mb-3 col-sm">
-                    <label htmlFor="phone" className="form-label">
-                      Telefon
-                    </label>
-                    <input
-                      type="number"
-                      id="phone"
-                      className="form-control"
-                      placeholder="np. 985 965 964"
-                      ref={phoneElRef}
-                    />
-                  </div>
-                </div>
-                {loading && <Loader />}
-                {msg !== null && (
-                  <Msg msg={msg.content} isSuccess={msg.isSuccess} />
-                )}
-                <button type="submit" className="btn btn-primary">
-                  Zarejstruj
-                </button>
-              </form>
+                  {loading && <Loader />}
+                  {msg !== null && (
+                    <Msg msg={msg.content} isSuccess={msg.isSuccess} />
+                  )}
+                  <button type="submit" className="btn btn-primary">
+                    Zarejstruj
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </section>
@@ -598,8 +538,12 @@ const HomePage = () => {
               </p>
               <div className="container col-xxl-8 px-4 py-5">
                 <div className="row">
-                  {dentistsData &&
-                    dentistsData.map((dentist, index) => (
+                  {loading && <Loader />}
+                  {msg !== null && (
+                    <Msg msg={msg.content} isSuccess={msg.isSuccess} />
+                  )}
+                  {dentists &&
+                    dentists.map((dentist, index) => (
                       <div className="col-lg-4" key={dentist._id}>
                         <img
                           src={docImg[index]}
@@ -637,7 +581,7 @@ const HomePage = () => {
           to="/#home"
           className={`back-to-top d-flex btn-primary align-items-center justify-content-center ${scroll}`}
         >
-          <i class="bi bi-arrow-up-short"></i>
+          <i className="bi bi-arrow-up-short"></i>
         </NavHashLink>
         <div className="footer-top">
           <div className="container">
