@@ -4,8 +4,8 @@ export const useFetchData = (queryToRequest) => {
   const API_URL = 'http://localhost:8000/graphql';
 
   const [data, setData] = useState([]);
-  const [loadingFetchData, setLoading] = useState(false);
-  const [msgFetchData, setMsg] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -36,7 +36,7 @@ export const useFetchData = (queryToRequest) => {
       .catch((err) => {
         setMsg({ content: err.message, isSuccess: false });
       });
-  }, []);
+  }, [queryToRequest]);
 
-  return { ...data, loadingFetchData, msgFetchData };
+  return { ...data, loading, msg };
 };
