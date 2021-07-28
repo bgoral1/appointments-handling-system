@@ -40,7 +40,7 @@ const Header = ({ isHome }) => {
               activeClassName="selected"
               className="nav-link px-2 link-dark"
             >
-              <i class="bi bi-house"></i>
+              <i className="bi bi-house"></i>
             </NavHashLink>
           </li>
           <li>
