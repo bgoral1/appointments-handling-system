@@ -1,17 +1,23 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import { Modal } from 'bootstrap';
 
-import './Modal.scss';
+const ModalComp = (props) => {
+  const modalDOM = useRef();
+  const [modal, setModal] = useState(null);
 
-const Modal = (props) => {
-  const closeModalRef = useRef();
+  useEffect(() => {
+    const modal = new Modal(modalDOM.current);
+    setModal(modal);
+  }, []);
 
   return (
     <div
       className="modal fade"
-      id="exampleModal"
+      id="modal"
       tabIndex="-1"
       aria-labelledby="ModalLabel"
       aria-hidden="true"
+      ref={modalDOM}
     >
       <div className="modal-dialog">
         <div className="modal-content">
@@ -30,14 +36,13 @@ const Modal = (props) => {
               type="button"
               className="btn btn-secondary"
               data-bs-dismiss="modal"
-              ref={closeModalRef}
             >
-              Zamknij
+              Anuluj
             </button>
             <button
               type="button"
               className="btn btn-primary"
-              onClick={(e) => props.onSubmit(e, closeModalRef)}
+              onClick={(e) => props.onSubmit(e, modal)}
             >
               Zapisz
             </button>
@@ -48,4 +53,4 @@ const Modal = (props) => {
   );
 };
 
-export default Modal;
+export default ModalComp;
