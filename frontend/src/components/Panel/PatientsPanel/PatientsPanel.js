@@ -1,62 +1,18 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 
 import AuthContext from '../../../context/auth-context';
+import { PatientsContext } from '../../../context/patients-context';
 import Table from './Table/Table';
 import Loader from '../../Loader/Loader';
+import Msg from '../../../components/Msg/Msg';
 
 const PatientsPanel = () => {
-  const [patients, setPatients] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { patients, setPatients, loading, setLoading, msg, setMsg } =
+    useContext(PatientsContext);
   const { token } = useContext(AuthContext);
 
-  const compare = (a, b) => {
-    if (a.lastName < b.lastName) {
-      return -1;
-    }
-    if (a.lastName > b.lastName) {
-      return 1;
-    }
-    return 0;
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    const requestBody = {
-      query: `
-          query{
-            patients {
-              _id
-              firstName
-              lastName
-              phone
-            }
-          }
-        `,
-    };
-
-    fetch('http://localhost:8000/graphql', {
-      method: 'POST',
-      body: JSON.stringify(requestBody),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed!');
-        }
-        return res.json();
-      })
-      .then((resData) => {
-        setPatients(resData.data.patients.sort(compare));
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
   const handleDelete = (id) => {
+    setLoading(true);
     const requestBody = {
       query: `
             mutation{
@@ -80,6 +36,7 @@ const PatientsPanel = () => {
     })
       .then((res) => {
         if (res.status !== 200 && res.status !== 201) {
+          setLoading(false);
           throw new Error('Failed!');
         }
         return res.json();
@@ -90,9 +47,10 @@ const PatientsPanel = () => {
             return patient._id !== resData.data.deletePatient._id;
           })
         );
+        setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        setMsg({ content: err.message, isSuccess: false });
       });
   };
 
@@ -101,11 +59,9 @@ const PatientsPanel = () => {
       <header className="header-normal">
         <h1>Pacjenci</h1>
       </header>
-      {loading ? (
-        <Loader />
-      ) : (
-        <Table content={patients} handleDelete={handleDelete} />
-      )}
+      {loading && <Loader />}
+      {patients && <Table content={patients} handleDelete={handleDelete} />}
+      {msg !== null && <Msg msg={msg.content} isSuccess={msg.isSuccess} />}
     </>
   );
 };
