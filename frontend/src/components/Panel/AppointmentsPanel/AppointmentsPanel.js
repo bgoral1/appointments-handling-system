@@ -5,6 +5,7 @@ import { AppointmentsContext } from '../../../context/appointments-context';
 import AppointmentForm from '../../../components/AppointmentForm/AppointmentForm';
 import Table from './Table/Table';
 import Loader from '../../../components/Loader/Loader';
+import Msg from '../../../components/Msg/Msg';
 
 const AppointmentsPanel = () => {
   const { token } = useContext(AuthContext);
@@ -66,10 +67,11 @@ const AppointmentsPanel = () => {
         </button>
         <AppointmentForm />
       </header>
-      {loading && <Loader />}
       {appointments && (
         <Table content={appointments} handleDelete={handleDelete} />
       )}
+      {loading && <Loader />}
+      {msg !== null && <Msg msg={msg.content} isSuccess={msg.isSuccess} />}
     </>
   );
 };

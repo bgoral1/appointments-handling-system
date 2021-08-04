@@ -59,8 +59,8 @@ const PatientsPanel = () => {
       <header className="header-normal">
         <h1>Pacjenci</h1>
       </header>
-      {loading && <Loader />}
       {patients && <Table content={patients} handleDelete={handleDelete} />}
+      {loading && <Loader />}
       {msg !== null && <Msg msg={msg.content} isSuccess={msg.isSuccess} />}
     </>
   );

@@ -57,7 +57,9 @@ export const DentistsContextProvider = ({ children }) => {
   }, [queryDentists]);
 
   return (
-    <DentistsContext.Provider value={{ dentists, setDentists, loading, msg }}>
+    <DentistsContext.Provider
+      value={{ dentists, setDentists, loading, setLoading, msg }}
+    >
       {children}
     </DentistsContext.Provider>
   );

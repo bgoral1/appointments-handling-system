@@ -52,7 +52,9 @@ export const ServicesContextProvider = ({ children }) => {
   }, [queryServices]);
 
   return (
-    <ServicesContext.Provider value={{ services, setServices, loading, msg }}>
+    <ServicesContext.Provider
+      value={{ services, setServices, loading, setLoading, msg, setMsg }}
+    >
       {children}
     </ServicesContext.Provider>
   );

@@ -1,63 +1,21 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
-import { Modal } from 'bootstrap';
+import React, { useRef, useContext } from 'react';
 
 import AuthContext from '../../../context/auth-context';
+import { ServicesContext } from '../../../context/services-context';
 import ModalComp from '../../../components/Modal/Modal';
 import Table from './Table/Table';
 import Loader from '../../Loader/Loader';
+import Msg from '../../../components/Msg/Msg';
 
 const ServicesPanel = () => {
-  const [modal, setModal] = useState(null);
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { services, setServices, loading, setLoading, msg, setMsg } =
+    useContext(ServicesContext);
   const { token } = useContext(AuthContext);
-  const exampleModal = useRef();
   const nameElRef = useRef(null);
   const priceElRef = useRef(null);
   const durationElRef = useRef(null);
 
-  useEffect(() => {
-    setLoading(true);
-    const requestBody = {
-      query: `
-          query{
-            services{
-              _id
-              name
-              duration
-              price
-            }
-          }
-        `,
-    };
-
-    fetch('http://localhost:8000/graphql', {
-      method: 'POST',
-      body: JSON.stringify(requestBody),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed!');
-        }
-        return res.json();
-      })
-      .then((resData) => {
-        setServices(resData.data.services);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
-  useEffect(() => {
-    setModal(new Modal(exampleModal.current));
-  }, []);
-
-  const modalHandler = (e, ref) => {
+  const submitHandler = (e, modal) => {
     e.preventDefault();
     const name = nameElRef.current.value;
     const price = +priceElRef.current.value;
@@ -95,16 +53,20 @@ const ServicesPanel = () => {
         return res.json();
       })
       .then((resData) => {
-        console.log(resData);
+        setLoading(false);
         setServices((prev) => [...prev, resData.data.createService]);
-        ref.current.click();
+        if (modal) {
+          setTimeout(() => modal.hide(), 500);
+        }
       })
       .catch((err) => {
-        console.log(err);
+        setLoading(false);
+        setMsg({ content: err.message, isSuccess: false });
       });
   };
 
   const handleDelete = (id) => {
+    setLoading(true);
     const requestBody = {
       query: `
             mutation{
@@ -138,9 +100,11 @@ const ServicesPanel = () => {
             return service._id !== resData.data.deleteService._id;
           })
         );
+        setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        setLoading(false);
+        setMsg({ content: err.message, isSuccess: false });
       });
   };
 
@@ -152,16 +116,12 @@ const ServicesPanel = () => {
           type="button"
           className="btn btn-round btn-secondary"
           data-bs-toggle="modal"
-          data-bs-target="#exampleModal"
+          data-bs-target="#modal"
           title="Dodaj usługę"
         >
           +
         </button>
-        <ModalComp
-          ref={exampleModal}
-          title="Dodaj usługę"
-          onSubmit={modalHandler}
-        >
+        <ModalComp title="Dodaj usługę" onSubmit={submitHandler}>
           <form>
             <div className="mb-3">
               <label htmlFor="name" className="form-label">
@@ -202,11 +162,9 @@ const ServicesPanel = () => {
           </form>
         </ModalComp>
       </header>
-      {loading ? (
-        <Loader />
-      ) : (
-        <Table content={services} handleDelete={handleDelete} />
-      )}
+      {services && <Table content={services} handleDelete={handleDelete} />}
+      {loading && <Loader />}
+      {msg !== null && <Msg msg={msg.content} isSuccess={msg.isSuccess} />}
     </>
   );
 };
