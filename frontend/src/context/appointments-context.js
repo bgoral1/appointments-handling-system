@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { sortObjectsByKeValue } from './../helpers/sortingObjFunc/sortObjectByKeyValue';
+import { sortObjectsByKeyValue } from './../helpers/sortingObjFunc/sortObjectByKeyValue';
 
 export const AppointmentsContext = React.createContext();
 
@@ -58,7 +58,7 @@ export const AppointmentsContextProvider = ({ children }) => {
       })
       .then((resData) => {
         setAppointments(
-          sortObjectsByKeValue(resData.data.appointments, 'startTime')
+          sortObjectsByKeyValue(resData.data.appointments, 'startTime')
         );
         setLoading(false);
       })

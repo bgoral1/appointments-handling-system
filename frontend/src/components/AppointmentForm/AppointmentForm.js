@@ -2,7 +2,7 @@ import React, { useContext, useState, useRef } from 'react';
 import moment from 'moment';
 
 import { isTimeBetween } from '../../helpers/dateRange/isTimeBetween';
-import { sortObjectsByKeValue } from '../../helpers/sortingObjFunc/sortObjectByKeyValue';
+import { sortObjectsByKeyValue } from '../../helpers/sortingObjFunc/sortObjectByKeyValue';
 import { ServicesContext } from '../../context/services-context';
 import { DentistsContext } from '../../context/dentists-context';
 import { AppointmentsContext } from '../../context/appointments-context';
@@ -193,7 +193,7 @@ const AppointmentForm = ({ isHome }) => {
             .then((resData) => {
               setLoading(false);
               setAppointments((prev) =>
-                sortObjectsByKeValue(
+                sortObjectsByKeyValue(
                   [...prev, resData.data.createAppointment],
                   'startTime'
                 )

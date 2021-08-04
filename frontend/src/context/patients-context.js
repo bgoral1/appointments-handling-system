@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { sortObjectsByKeValue } from './../helpers/sortingObjFunc/sortObjectByKeyValue';
+import { sortObjectsByKeyValue } from './../helpers/sortingObjFunc/sortObjectByKeyValue';
 
 export const PatientsContext = React.createContext();
 
@@ -44,7 +44,7 @@ export const PatientsContextProvider = ({ children }) => {
         return res.json();
       })
       .then((resData) => {
-        setPatients(sortObjectsByKeValue(resData.data.patients, 'lastName'));
+        setPatients(sortObjectsByKeyValue(resData.data.patients, 'lastName'));
         setLoading(false);
       })
       .catch((err) => {

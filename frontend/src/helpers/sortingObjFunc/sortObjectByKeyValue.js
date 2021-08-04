@@ -10,6 +10,6 @@ const compareObjectByValue = (key) => {
   };
 };
 
-export const sortObjectsByKeValue = (objects, key) => {
+export const sortObjectsByKeyValue = (objects, key) => {
   return objects.sort(compareObjectByValue(key));
 };

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 
 import AuthContext from '../../../context/auth-context';
 import { PatientsContext } from '../../../context/patients-context';
+import { sortObjectsByKeyValue } from '../../../helpers/sortingObjFunc/sortObjectByKeyValue';
 import Table from './Table/Table';
 import Loader from '../../Loader/Loader';
 import Msg from '../../../components/Msg/Msg';
@@ -10,6 +11,10 @@ const PatientsPanel = () => {
   const { patients, setPatients, loading, setLoading, msg, setMsg } =
     useContext(PatientsContext);
   const { token } = useContext(AuthContext);
+
+  // if (patients !== []) {
+  //   setPatients(sortObjectsByKeyValue(patients, 'lastName'));
+  // }
 
   const handleDelete = (id) => {
     setLoading(true);
