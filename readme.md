@@ -38,6 +38,8 @@ npm install
 
 ## Run App
 
+- both in project directory and frontend directory:
+
 ```
 npm start
 ```
