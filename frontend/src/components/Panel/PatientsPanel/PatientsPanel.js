@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 
 import AuthContext from '../../../context/auth-context';
 import { PatientsContext } from '../../../context/patients-context';
-import { sortObjectsByKeyValue } from '../../../helpers/sortingObjFunc/sortObjectByKeyValue';
+// import { sortObjectsByKeyValue } from '../../../helpers/sortingObjFunc/sortObjectByKeyValue';
 import Table from './Table/Table';
 import Loader from '../../Loader/Loader';
 import Msg from '../../../components/Msg/Msg';
