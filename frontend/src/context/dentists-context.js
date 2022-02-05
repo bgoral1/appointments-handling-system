@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 export const DentistsContext = React.createContext();
 
 export const DentistsContextProvider = ({ children }) => {
-  const API_URL = 'http://localhost:8000/graphql';
-
   const queryDentists = `
   query{
     dentists{
@@ -31,7 +29,7 @@ export const DentistsContextProvider = ({ children }) => {
       query: queryDentists,
     };
 
-    fetch(API_URL, {
+    fetch(process.env.API_URL, {
       method: 'POST',
       body: JSON.stringify(requestBody),
       headers: {

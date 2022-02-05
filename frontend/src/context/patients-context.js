@@ -4,8 +4,6 @@ import { sortObjectsByKeyValue } from './../helpers/sortingObjFunc/sortObjectByK
 export const PatientsContext = React.createContext();
 
 export const PatientsContextProvider = ({ children }) => {
-  const API_URL = 'http://localhost:8000/graphql';
-
   const queryPatients = `
   query{
     patients {
@@ -27,7 +25,7 @@ export const PatientsContextProvider = ({ children }) => {
       query: queryPatients,
     };
 
-    fetch(API_URL, {
+    fetch(process.env.API_URL, {
       method: 'POST',
       body: JSON.stringify(requestBody),
       headers: {

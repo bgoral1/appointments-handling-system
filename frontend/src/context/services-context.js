@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 export const ServicesContext = React.createContext();
 
 export const ServicesContextProvider = ({ children }) => {
-  const API_URL = 'http://localhost:8000/graphql';
-
   const queryServices = `
   query{
     services{
@@ -26,7 +24,7 @@ export const ServicesContextProvider = ({ children }) => {
       query: queryServices,
     };
 
-    fetch(API_URL, {
+    fetch(process.env.API_URL, {
       method: 'POST',
       body: JSON.stringify(requestBody),
       headers: {
