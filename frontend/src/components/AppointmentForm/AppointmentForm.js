@@ -127,7 +127,7 @@ const AppointmentForm = ({ isHome }) => {
           `,
         };
 
-        fetch('http://localhost:8000/graphql', {
+        fetch(process.env.REACT_APP_API_URL, {
           method: 'POST',
           body: JSON.stringify(requestCreatePatient),
           headers: {
@@ -177,7 +177,7 @@ const AppointmentForm = ({ isHome }) => {
             `,
           };
 
-          fetch('http://localhost:8000/graphql', {
+          fetch(process.env.REACT_APP_API_URL, {
             method: 'POST',
             body: JSON.stringify(requestBody),
             headers: {

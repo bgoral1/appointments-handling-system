@@ -24,7 +24,7 @@ export const ServicesContextProvider = ({ children }) => {
       query: queryServices,
     };
 
-    fetch(process.env.API_URL, {
+    fetch(process.env.REACT_APP_API_URL, {
       method: 'POST',
       body: JSON.stringify(requestBody),
       headers: {
