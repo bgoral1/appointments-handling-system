@@ -6,6 +6,8 @@
 
 > Backend API and frontend designed to supports appointments making in not existing dental clinic "Ząbek" (with Polish language UI)
 
+- demo available at [zabek.netlify.app](https://zabek.netlify.app/)
+
 ## Technology stack
 
 Node.js, Express, MongoDB, GraphQL, React, Boostrap 5.
